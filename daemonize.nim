@@ -1,12 +1,14 @@
 import os except sleep
 import posix, parseutils
-include system/ansi_c
+
 ## This library makes your code run as a daemon process on Unix-like systems.
 
 var
   pid: Pid
   pidFileInner: string
   fi, fo, fe: File
+
+proc c_signal(sig: cint, handler: proc (a: cint) {.noconv.}) {.importc: "signal", header: "<signal.h>".}
 
 proc onStop(sig: cint) {.noconv.} =
   close(fi)
@@ -16,7 +18,7 @@ proc onStop(sig: cint) {.noconv.} =
 
   quit(QuitSuccess)
 
-template daemonize*(pidfile, si, so, se: string, body: stmt): expr =
+template daemonize*(pidfile, si, so, se: string, body: stmt): stmt {.immediate.} =
   ## deamonizer
   ##
   ## pidfile: path to file where pid will be stored
@@ -62,8 +64,6 @@ template daemonize*(pidfile, si, so, se: string, body: stmt): expr =
 
   pid = getpid()
   writeFile(pidfile, $pid)
-
-  c_free(addr pid)
 
   body
 
