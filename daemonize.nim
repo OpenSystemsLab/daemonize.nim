@@ -18,13 +18,14 @@ proc onStop(sig: cint) {.noconv.} =
 
   quit(QuitSuccess)
 
-template daemonize*(pidfile, si, so, se: string, body: stmt): stmt {.immediate.} =
+template daemonize*(pidfile, si, so, se, cd: string,body: stmt): stmt {.immediate.} =
   ## deamonizer
   ##
   ## pidfile: path to file where pid will be stored
   ## si: standard input for daemonzied process
   ## so: standard output for daemonzied process
   ## se: standard ouput for daemonzied process
+  ## cd: directory to switch to, nil or empty to stay
 
   if fileExists(pidfile):
     raise newException(IOError, "pidfile " & pidfile & " already exist, daemon already running?")
@@ -34,7 +35,8 @@ template daemonize*(pidfile, si, so, se: string, body: stmt): stmt {.immediate.}
   if pid > 0:
     quit(QuitSuccess)
 
-  discard chdir("/")
+  if not isNilorEmpty(cd):
+    discard chdir(cd)
   discard setsid()
   discard umask(0)
 
