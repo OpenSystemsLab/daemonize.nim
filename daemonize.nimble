@@ -1,6 +1,6 @@
 [Package]
 name          = "daemonize"
-version       = "0.0.3"
+version       = "0.0.4"
 author        = "Huy Doan"
 description   = "This library makes your code run as a daemon process on Unix-like systems"
 license       = "MIT"

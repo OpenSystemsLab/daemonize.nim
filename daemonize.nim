@@ -63,6 +63,8 @@ template daemonize*(pidfile, si, so, se, cd: string,body: stmt): stmt {.immediat
 
   c_signal(SIGINT, onStop)
   c_signal(SIGTERM, onStop)
+  c_signal(SIGHUP, onStop)
+  c_signal(SIGQUIT, onStop)
 
   pid = getpid()
   writeFile(pidfile, $pid)
@@ -76,5 +78,5 @@ when isMainModule:
       i.inc()
       echo i
       discard sleep(1)
-  daemonize("/tmp/daemonize.pid", "/dev/null", "/tmp/daemonize.out", "/tmp/daemonize.err"):
+  daemonize("/tmp/daemonize.pid", "/dev/null", "/tmp/daemonize.out", "/tmp/daemonize.err", "/"):
     main()
