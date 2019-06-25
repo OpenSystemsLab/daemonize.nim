@@ -18,7 +18,7 @@ proc onStop(sig: cint) {.noconv.} =
 
   quit(QuitSuccess)
 
-template daemonize*(pidfile, si, so, se, cd: string,body: stmt): stmt {.immediate.} =
+template daemonize*(pidfile, si, so, se, cd: string,body: typed): void =
   ## deamonizer
   ##
   ## pidfile: path to file where pid will be stored
@@ -35,7 +35,7 @@ template daemonize*(pidfile, si, so, se, cd: string,body: stmt): stmt {.immediat
   if pid > 0:
     quit(QuitSuccess)
 
-  if not isNilorEmpty(cd):
+  if not cd.len == 0:
     discard chdir(cd)
   discard setsid()
   discard umask(0)
@@ -47,15 +47,15 @@ template daemonize*(pidfile, si, so, se, cd: string,body: stmt): stmt {.immediat
   flushFile(stdout)
   flushFile(stderr)
 
-  if not si.isNil and si != "":
+  if not si.len == 0:
     fi = open(si, fmRead)
     discard dup2(getFileHandle(fi), getFileHandle(stdin))
 
-  if not so.isNil and so != "":
+  if not so.len == 0:
     fo = open(so, fmAppend)
     discard dup2(getFileHandle(fo), getFileHandle(stdout))
 
-  if not se.isNil and se != "":
+  if not se.len == 0:
     fe = open(se, fmAppend)
     discard dup2(getFileHandle(fe), getFileHandle(stderr))
 
